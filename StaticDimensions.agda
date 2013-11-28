@@ -438,6 +438,6 @@ module StaticDimensions where
   e=mc²
     = (+ 1) kilograms Q*Q (+ 1) velocitys Q²
 
-  e=m∙c²_D≡D_Joules : Bool -- Returns True.
-  e=m∙c²_D≡D_Joules
+  e=mc²_D≡D_Joules : Bool -- Returns True.
+  e=mc²_D≡D_Joules
     = Quantity.dimension (e=mc²) D≡D Joule
