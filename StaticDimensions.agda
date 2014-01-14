@@ -440,4 +440,4 @@ module StaticDimensions where
 
   e=mc²_D≡D_Joules : Bool -- Returns True.
   e=mc²_D≡D_Joules
-    = Quantity.dimension (e=mc²) D≡D Joule
+    = (e=mc² Q→D) D≡D Joule
