@@ -437,5 +437,5 @@ module StaticDimensions where
   e=_∙_² : ℤ → ℤ → Quantity
   e= m ∙ c ² = m kilograms Q*Q (c velocitys Q²)
 
-  e=mc²isEqualToJoules : ∀ {m c : ℤ} → Bool
-  e=mc²isEqualToJoules = λ {m} {c} → (Q→D e= m ∙ c ²) D≡D Joule -- QED.
+  e=mc²isMeasuredInJoules : ∀ {m c : ℤ} → Bool
+  e=mc²isMeasuredInJoules = λ {m} {c} → (Q→D e= m ∙ c ²) D≡D Joule -- QED.
