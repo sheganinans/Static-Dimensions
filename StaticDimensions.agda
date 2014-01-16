@@ -338,8 +338,8 @@ module StaticDimensions where
   _Q*-10 : Quantity → Quantity
   q Q*-10 = q Q*ℤ -[1+ 9 ]
 
-  _Q→D : Quantity → Dim
-  quant d q Q→D = d
+  Q→D : Quantity → Dim
+  Q→D (quant d q) = d
 
   _kilograms : ℤ → Quantity
   k kilograms = quant M k
@@ -434,10 +434,8 @@ module StaticDimensions where
   _springConstants : ℤ → Quantity
   s springConstants = quant SpringConstant s
 
-  e=mc² : Quantity --Arbitrary values for m and c.
-  e=mc²
-    = (+ 1) kilograms Q*Q (+ 1) velocitys Q²
+  e=_∙_² : ℤ → ℤ → Quantity
+  e= m ∙ c ² = m kilograms Q*Q (c velocitys Q²)
 
-  e=mc²_D≡D_Joules : Bool -- Returns True.
-  e=mc²_D≡D_Joules
-    = (e=mc² Q→D) D≡D Joule
+  e=mc²isEqualToJoules : ∀ {m c : ℤ} → Bool
+  e=mc²isEqualToJoules = λ {m} {c} → (Q→D e= m ∙ c ²) D≡D Joule -- QED.
