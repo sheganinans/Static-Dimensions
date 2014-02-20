@@ -12,6 +12,8 @@ module StaticDimensions where
   import Data.Nat.Coprimality as C
   open import Relation.Nullary.Decidable
 
+  data _≡_ {A : Set} (x : A) : A → Set where
+    refl : x ≡ x
 
   _ℕ≡ℕ_ : ℕ → ℕ → Bool
   zero   ℕ≡ℕ zero   = true
@@ -437,5 +439,5 @@ module StaticDimensions where
   e=_∙_² : ℤ → ℤ → Quantity
   e= m ∙ c ² = m kilograms Q*Q (c velocitys Q²)
 
-  e=mc²isMeasuredInJoules : ∀ {m c : ℤ} → Bool
-  e=mc²isMeasuredInJoules = λ {m} {c} → (Q→D e= m ∙ c ²) D≡D Joule -- QED.
+  e=mc²isMeasuredInJoules : ∀ {m c : ℤ} → ((Q→D e= m ∙ c ²) D≡D Joule) ≡ true
+  e=mc²isMeasuredInJoules = refl -- QED.
