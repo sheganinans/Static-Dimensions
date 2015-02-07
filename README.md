@@ -7,3 +7,7 @@ Similar to [Dimensional](http://hackage.haskell.org/package/dimensional) and [Di
 ~~Hyperlinked, syntax-colored, html version of the file is located at StaticDimensions.html for ease of viewing. Just download and view in your favorite browser. (Hopefully github will get syntax highlighting for Agda soon. :D)~~ Ahahaha! Github, you rock!
 
 Questions or Comments? sheganinans@gmail.com
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/sheganinans/static-dimensions/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
