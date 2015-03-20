@@ -80,7 +80,8 @@ module StaticDimensions where
 
 
 {-
-  Addition, subtraction, multiplication, and exponentiation of dimensions. Simply wrapping integer operations.
+  Addition, subtraction, multiplication, and exponentiation of dimensions.
+  Simply wrapping integer operations.
 -}
 
   _D+D_ : Dim → Dim → Dim
@@ -364,7 +365,7 @@ module StaticDimensions where
 {-
   Equality, addition, multiplication, and exponentiation of quantities.
   Addition and multiplication are interesting in their own rights and
-  are their peculiarities are detailed in their own comments.
+  their peculiarities are detailed in their own comments.
 -}
 
   _Q≡Q_ : Quantity → Quantity → Bool
@@ -373,12 +374,12 @@ module StaticDimensions where
 
 {-
   Addition may not succeed because one may attempt to add unlike quantities together.
-  To illustate this, their is no proper physical way to add a meter to a meter², or
+  To illustate this, there is no proper physical way to add a meter to a meter², or
   adding a kilogram to a newton. So either of these attempts would result in a Nothing.
   You can multiply quantities with unlike dimensions and the details of which are rather simple.
   This could be improved by either upgrading the Maybe to an Either or by tracking
   the dimension in the type and rejecting such additions at compile-time.
-  However this is not the goal of this project and the path of least resistance is used.
+  However this is not the goal of this file and the path of least resistance is used.
 -}
 
   _Q+Q_ : Quantity → Quantity → Maybe Quantity
@@ -430,7 +431,7 @@ module StaticDimensions where
   Used in the final proof.
 -}
 
-  Q→D : Quantity → Dim
+  Q→D_ : Quantity → Dim
   Q→D (quant d q) = d
 
 
