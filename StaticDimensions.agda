@@ -12,6 +12,9 @@ module StaticDimensions where
   import Data.Nat.Coprimality as C
   open import Relation.Nullary.Decidable
 
+
+-- The tiniest prelude.
+
   data _≡_ {A : Set} (x : A) : A → Set where
     refl : x ≡ x
 
@@ -27,6 +30,9 @@ module StaticDimensions where
   -[1+ _ ]  ℤ≡ℤ (ℤ.+ _)   = false
   (ℤ.+   n) ℤ≡ℤ (ℤ.+ n₁)  = n ℕ≡ℕ n₁
 
+
+-- Basic Exponents.
+
   _ℤ² : ℤ → ℤ
   z ℤ² = z ℤ*ℤ z
 
@@ -35,6 +41,14 @@ module StaticDimensions where
 
   _ℤ⁴ : ℤ → ℤ
   z ℤ⁴ = z ℤ*ℤ z ℤ*ℤ z ℤ*ℤ z
+
+
+{-
+  Dim is the central datastructure in this file, each physical quantity has a dimension.
+  Quantities can also be dimensionless by having zeroes in all seven positions.
+  You can add only like dimensions and you can multiply like and unlike dimensions.
+  However that logic comes later, this is simply the definition.
+-}
 
   record Dim : Set where
     constructor dim
@@ -47,6 +61,12 @@ module StaticDimensions where
       n : ℤ
       j : ℤ
 
+
+{-
+  Equality of dimensions, simply makes sure that all the integers in each position are
+  equal between the two dimensions.
+-}
+
   _D≡D_ : Dim → Dim → Bool
   dim m l t q θ n j D≡D
     dim m₁ l₁ t₁ q₁ θ₁ n₁ j₁
@@ -58,8 +78,13 @@ module StaticDimensions where
       ∧ n ℤ≡ℤ n₁
       ∧ j ℤ≡ℤ j₁
 
-  _⊚_ : Dim → Dim → Dim
-  dim m l t q θ n j ⊚
+
+{-
+  Addition, subtraction, multiplication, and exponentiation of dimensions. Simply wrapping integer operations.
+-}
+
+  _D+D_ : Dim → Dim → Dim
+  dim m l t q θ n j D+D
     dim m₁ l₁ t₁ q₁ θ₁ n₁ j₁
       = dim (m ℤ+ℤ m₁)
             (l ℤ+ℤ l₁)
@@ -121,6 +146,11 @@ module StaticDimensions where
           (n ℤ⁴)
           (j ℤ⁴)
 
+
+{-
+  Wrappers for addition, subtraction, and multiplication of a specific component by a scalar.
+-}
+
   _m+ℤ_ : Dim → ℤ → Dim
   dim m l t q θ n j m+ℤ z = dim (m ℤ+ℤ z) l  t  q  θ  n  j
   _l+ℤ_ : Dim → ℤ → Dim
@@ -151,7 +181,6 @@ module StaticDimensions where
   _j-ℤ_ : Dim → ℤ → Dim
   dim m l t q θ n j j-ℤ z = dim  m  l  t  q  θ  n (j ℤ-ℤ z)
 
-
   _m*ℤ_ : Dim → ℤ → Dim
   dim m l t q θ n j m*ℤ z = dim (m ℤ*ℤ z) l  t  q  θ  n  j
   _l*ℤ_ : Dim → ℤ → Dim
@@ -167,8 +196,18 @@ module StaticDimensions where
   _j*ℤ_ : Dim → ℤ → Dim
   dim m l t q θ n j j*ℤ z = dim  m  l  t  q  θ  n (j ℤ*ℤ z)
 
+
+{-
+  Nicer names for integer zero and one.
+-}
+
   ℤ0 = (+ 0)
   ℤ1 = (+ 1)
+
+
+{-
+  Using the previously defined scalar operations to define succ and pred for each component.
+-}
 
   _M++ : Dim → Dim
   d M++ = d m+ℤ ℤ1
@@ -199,6 +238,11 @@ module StaticDimensions where
   d N-- = d n-ℤ ℤ1
   _J-- : Dim → Dim
   d J-- = d j-ℤ ℤ1
+
+
+{-
+  The zeroth dimension, along with an enumeration of the lower dimensions.
+-}
 
   D0 : Dim -- m  l  t  q  θ  n  j
   D0 = dim   ℤ0 ℤ0 ℤ0 ℤ0 ℤ0 ℤ0 ℤ0
@@ -250,6 +294,19 @@ module StaticDimensions where
   N⁻³ = N⁻² N--
   J⁻³ = J⁻² J--
 
+
+{-
+  Nicer wrapper for D+D, only used for the next section to avoid noise in the definitions.
+-}
+
+  _⊚_ : Dim → Dim → Dim
+  a ⊚ b = a D+D b
+
+
+{-
+  Names of commonly used dimensions and their definitions.
+-}
+
   IntegerHarmonic = D0
   Radius          = D0
   Radian          = D0
@@ -291,14 +348,38 @@ module StaticDimensions where
 
   SpringConstant  = Newton
 
+
+{-
+  The second most important (and only other) datastructure.
+  Every quanitity has a scalar value and a dimension.
+-}
+
   record Quantity : Set where
     constructor quant
     field
       dimension : Dim
       quantity  : ℤ
 
+
+{-
+  Equality, addition, multiplication, and exponentiation of quantities.
+  Addition and multiplication are interesting in their own rights and
+  are their peculiarities are detailed in their own comments.
+-}
+
   _Q≡Q_ : Quantity → Quantity → Bool
   quant d q Q≡Q quant d₁ q₁ = d D≡D d₁ ∧ q ℤ≡ℤ q₁
+
+
+{-
+  Addition may not succeed because one may attempt to add unlike quantities together.
+  To illustate this, their is no proper physical way to add a meter to a meter², or
+  adding a kilogram to a newton. So either of these attempts would result in a Nothing.
+  You can multiply quantities with unlike dimensions and the details of which are rather simple.
+  This could be improved by either upgrading the Maybe to an Either or by tracking
+  the dimension in the type and rejecting such additions at compile-time.
+  However this is not the goal of this project and the path of least resistance is used.
+-}
 
   _Q+Q_ : Quantity → Quantity → Maybe Quantity
   quant d q Q+Q quant d₁ q₁
@@ -306,8 +387,11 @@ module StaticDimensions where
       then just (quant d (q ℤ+ℤ q₁))
       else nothing
 
-  _D+D_ : Dim → Dim → Dim
-  a D+D b = a ⊚ b
+
+{-
+  Multiplying two quanitities is simply multiplying the two scalar values and adding together
+  the two dimensions componentwise.
+-}
 
   _Q*Q_ : Quantity → Quantity → Quantity
   quant d q Q*Q quant d₁ q₁
@@ -340,8 +424,20 @@ module StaticDimensions where
   _Q*-10 : Quantity → Quantity
   q Q*-10 = q Q*ℤ -[1+ 9 ]
 
+
+{-
+  Takes a Quantity and simply projects out the Dimension.
+  Used in the final proof.
+-}
+
   Q→D : Quantity → Dim
   Q→D (quant d q) = d
+
+
+{-
+  Enumerating the postfix constructors for the Quantitys to make them more English-like.
+  Decided to ignore the standard pluralization rules to make the names more consistent.
+-}
 
   _kilograms : ℤ → Quantity
   k kilograms = quant M k
@@ -436,8 +532,25 @@ module StaticDimensions where
   _springConstants : ℤ → Quantity
   s springConstants = quant SpringConstant s
 
+
+{-
+  The definition of e = mc².
+  It is defined as a function that takes two arguments, m and c.
+  m is a mass, measured kilograms, c is a velocity, measured in meters per second.
+  e is defined as m kilograms times the velocity c squared.
+-}
+
   e=_∙_² : ℤ → ℤ → Quantity
   e= m ∙ c ² = m kilograms Q*Q (c velocitys Q²)
 
+
+{-
+  This is the proof, it is actually more general than stated, since it is valid for all speeds of light.
+  In english the proposition reads: Projecting the dimension of e=mc², it is equal to Joule for all m and c.
+  To prove the proposition, the trivial proof is used, ie: reflexivity.
+  Which simply states that the RHS and the LHS are indeed equal by the law of identity.
+  Thank you Curry–Howard isomorphism!
+-}
+
   e=mc²isMeasuredInJoules : ∀ {m c : ℤ} → ((Q→D e= m ∙ c ²) D≡D Joule) ≡ true
-  e=mc²isMeasuredInJoules = refl -- QED.
+  e=mc²isMeasuredInJoules = refl -- QED. Simply evoking reflexivity.
