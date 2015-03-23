@@ -40,7 +40,7 @@ module StaticDimensions where
   z ℤ³ = z ℤ*ℤ z ℤ*ℤ z
 
   _ℤ⁴ : ℤ → ℤ
-  z ℤ⁴ = z ℤ*ℤ z ℤ*ℤ z ℤ*ℤ z
+  z ℤ⁴ = z ℤ² ℤ²
 
 
 {-
