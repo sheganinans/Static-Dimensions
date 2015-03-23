@@ -33,15 +33,6 @@ module StaticDimensions where
 
 -- Basic Exponents.
 
-  _ℕ² : ℕ → ℕ
-  z ℕ² = z ℕ*ℕ z
-
-  _ℕ³ : ℕ → ℕ
-  z ℕ³ = z ℕ*ℕ z ℕ*ℕ z
-
-  _ℕ⁴ : ℕ → ℕ
-  z ℕ⁴ = z ℕ*ℕ z ℕ*ℕ z ℕ*ℕ z
-
   _ℤ² : ℤ → ℤ
   z ℤ² = z ℤ*ℤ z
 
@@ -55,6 +46,8 @@ module StaticDimensions where
 {-
   Dim is the central datastructure in this file, each physical quantity has a dimension.
   A dimension is a pair of DimT, which represent the positive and negative components of a dimension.
+  Would rather have Naturals in each component instead of Integers, but the Naturals are not closed
+  under subtraction, and thus not total. So much for making illegal states unrepresentable!
   You can add only like dimensions and you can multiply like and unlike dimensions.
   However that logic comes later, this is simply the definition.
 -}
@@ -124,6 +117,7 @@ module StaticDimensions where
              (n ℤ+ℤ n₁)
              (j ℤ+ℤ j₁)
 
+  infixl 5 _D+D_
   _D+D_ : Dim -> Dim -> Dim
   a D+D b = liftDim2 _DT+DT_ a b
 
@@ -376,11 +370,28 @@ module StaticDimensions where
   N⁻³ = N⁻² Nn++
   J⁻³ = J⁻² Jn++
 
+  M⁴ = M³ Mp++
+  L⁴ = L³ Lp++
+  T⁴ = T³ Tp++
+  Q⁴ = Q³ Qp++
+  Θ⁴ = Θ³ Θp++
+  N⁴ = N³ Np++
+  J⁴ = J³ Jp++
+
+  M⁻⁴ = M⁻³ Mn++
+  L⁻⁴ = L⁻³ Ln++
+  T⁻⁴ = T⁻³ Tn++
+  Q⁻⁴ = Q⁻³ Qn++
+  Θ⁻⁴ = Θ⁻³ Θn++
+  N⁻⁴ = N⁻³ Nn++
+  J⁻⁴ = J⁻³ Jn++
+
 
 {-
   Nicer wrapper for D+D, only used for the next section to avoid noise in the definitions.
 -}
 
+  infixl 5 _⊚_
   _⊚_ : Dim → Dim → Dim
   a ⊚ b = a D+D b
 
@@ -402,23 +413,23 @@ module StaticDimensions where
   Mol      = N
   Candela  = J
 
-  Hertz    =             T⁻¹
-  Velocity =      L    ⊚ T⁻¹
-  Newton   = (M ⊚ L)   ⊚ T⁻²
-  Pascal   = (M ⊚ L⁻¹) ⊚ T⁻²
-  Joule    = (M ⊚  L²) ⊚ T⁻²
-  Watt     = (M ⊚  L²) ⊚ T⁻³
+  Hertz    =           T⁻¹
+  Velocity =     L   ⊚ T⁻¹
+  Newton   = M ⊚ L   ⊚ T⁻²
+  Pascal   = M ⊚ L⁻¹ ⊚ T⁻²
+  Joule    = M ⊚ L²  ⊚ T⁻²
+  Watt     = M ⊚ L²  ⊚ T⁻³
 
   Coulomb      =       Q ⊚ T
   CoulombMeter = Coulomb ⊚ L
 
-  Volt   = (M   ⊚  L²) ⊚   (T⁻³ ⊚ Q⁻¹)
-  Farad  = (M⁻¹ ⊚ L⁻²) ⊚ (T² D² ⊚  Q²)
-  Ohm    = (M   ⊚  L²) ⊚   (T⁻³ ⊚ Q⁻²)
-  Siemen = (M⁻¹ ⊚ L⁻²) ⊚    (T³ ⊚  Q²)
-  Weber  = (M   ⊚  L²) ⊚   (T⁻² ⊚ Q⁻¹)
-  Tesla  = (M   ⊚ T⁻²)          ⊚ Q⁻¹
-  Henry  = (M   ⊚  L²) ⊚   (T⁻² ⊚ Q⁻²)
+  Volt   = M   ⊚ L²  ⊚ T⁻³ ⊚ Q⁻¹
+  Farad  = M⁻¹ ⊚ L⁻² ⊚ T⁴  ⊚ Q²
+  Ohm    = M   ⊚ L²  ⊚ T⁻³ ⊚ Q⁻²
+  Siemen = M⁻¹ ⊚ L⁻² ⊚ T³  ⊚ Q²
+  Weber  = M   ⊚ L²  ⊚ T⁻² ⊚ Q⁻¹
+  Tesla  = M   ⊚       T⁻² ⊚ Q⁻¹
+  Henry  = M   ⊚ L²  ⊚ T⁻² ⊚ Q⁻²
 
   Celcius = Kelvin
 
@@ -430,7 +441,8 @@ module StaticDimensions where
 
   SpringConstant  = Newton
 
-
+  lol : Bool
+  lol = Celcius D≡D Kelvin
 {-
   The second most important (and only other) datastructure.
   Every quanitity has a scalar value and a positive dimension and a negative dimension.
@@ -439,7 +451,7 @@ module StaticDimensions where
   record Quantity : Set where
     constructor quant
     field
-      d : Dim
+      dims : Dim
       quantity  : ℤ
 
 
@@ -483,10 +495,10 @@ module StaticDimensions where
   quant d q Q² = quant (d D+D d) (q ℤ²)
 
   _Q³ : Quantity → Quantity
-  quant d q Q³ = quant ((d D+D d) D+D d) (q ℤ³)
+  quant d q Q³ = quant (d D+D d D+D d) (q ℤ³)
 
   _Q⁴ : Quantity → Quantity
-  quant d q Q⁴ = quant (((d D+D d) D+D d) D+D d) (q ℤ⁴)
+  quant d q Q⁴ = quant (d D+D d D+D d D+D d) (q ℤ⁴)
 
   _Q+ℤ_ : Quantity → ℤ → Quantity
   quant d q Q+ℤ z = quant d (q ℤ+ℤ z)
