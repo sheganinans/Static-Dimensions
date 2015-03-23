@@ -386,7 +386,7 @@ module StaticDimensions where
 
   infixl 5 _⊚_
   _⊚_ : Dim → Dim → Dim
-  a ⊚ b = a D+D b
+  _⊚_ = _D+D_
 
 
 {-
