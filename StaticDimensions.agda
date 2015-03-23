@@ -46,10 +46,10 @@ module StaticDimensions where
 {-
   Dim is the central datastructure in this file, each physical quantity has a dimension.
   A dimension is a pair of DimT, which represent the positive and negative components of a dimension.
-  Would rather have Naturals in each component instead of Integers, but the Naturals are not closed
-  under subtraction, and thus not total. So much for making illegal states unrepresentable!
   You can add only like dimensions and you can multiply like and unlike dimensions.
   However that logic comes later, this is simply the definition.
+  Would rather have Naturals in each component instead of Integers, but the Naturals are not closed
+  under subtraction, and thus not total. So much for making illegal states unrepresentable!
 -}
 
   record DimT : Set where
