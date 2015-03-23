@@ -3,14 +3,10 @@ module StaticDimensions where
   open import Data.Bool
     renaming (T to TT)
   open import Data.Nat
-    renaming (_+_ to _ℕ+ℕ_; _*_ to _ℕ*ℕ_; suc to ℕsuc; pred to ℕpred)
+    renaming (_+_ to _ℕ+ℕ_; _*_ to _ℕ*ℕ_; suc to ℕsuc)
   open import Data.Integer
     renaming (_+_ to _ℤ+ℤ_; _-_ to _ℤ-ℤ_; _*_ to _ℤ*ℤ_; suc to ℤsuc)
   open import Data.Maybe
-  open import Function
-  open import Algebra.Structures
-  import Data.Nat.Coprimality as C
-  open import Relation.Nullary.Decidable
 
 
 -- The tiniest prelude.
@@ -430,8 +426,6 @@ module StaticDimensions where
   Weber  = M   ⊚ L²  ⊚ T⁻² ⊚ Q⁻¹
   Tesla  = M   ⊚       T⁻² ⊚ Q⁻¹
   Henry  = M   ⊚ L²  ⊚ T⁻² ⊚ Q⁻²
-
-  Celcius = Kelvin
 
   Lumen     =                J
   Lux       = L⁻²          ⊚ J
