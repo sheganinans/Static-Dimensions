@@ -441,8 +441,7 @@ module StaticDimensions where
 
   SpringConstant  = Newton
 
-  lol : Bool
-  lol = Celcius D≡D Kelvin
+
 {-
   The second most important (and only other) datastructure.
   Every quanitity has a scalar value and a positive dimension and a negative dimension.
