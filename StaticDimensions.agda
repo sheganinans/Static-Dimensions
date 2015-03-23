@@ -645,5 +645,7 @@ module StaticDimensions where
   Thank you Curry–Howard isomorphism!
 -}
 
+--                                        LHS                            RHS
+--                                        ----------------------------   ----
   e=mc²isMeasuredInJoules : ∀ {m c : ℤ} → ((Q→D e= m ∙ c ²) D≡D Joule) ≡ true
   e=mc²isMeasuredInJoules = refl -- QED. Simply evoking reflexivity.
