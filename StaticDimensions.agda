@@ -86,7 +86,7 @@ module StaticDimensions where
       ∧ n ℤ≡ℤ n₁
       ∧ j ℤ≡ℤ j₁
 
-  _D≡D_ : Dim -> Dim -> Bool
+  _D≡D_ : Dim → Dim → Bool
   dim p n D≡D dim p₁ n₁ = p DT≡DT p₁ ∧ n DT≡DT n₁
 
 
@@ -94,10 +94,10 @@ module StaticDimensions where
   Helper functions to lift functions from DimT to Dim.
 -}
 
-  liftDim1 : (DimT -> DimT) -> Dim -> Dim
+  liftDim1 : (DimT → DimT) → Dim → Dim
   liftDim1 f (dim p n) = dim (f p) (f n)
 
-  liftDim2 : (DimT -> DimT -> DimT) -> Dim -> Dim -> Dim
+  liftDim2 : (DimT → DimT → DimT) → Dim → Dim → Dim
   liftDim2 f (dim p n) (dim p₁ n₁) = dim (f p p₁) (f n n₁)
 
 
@@ -118,7 +118,7 @@ module StaticDimensions where
              (j ℤ+ℤ j₁)
 
   infixl 5 _D+D_
-  _D+D_ : Dim -> Dim -> Dim
+  _D+D_ : Dim → Dim → Dim
   a D+D b = liftDim2 _DT+DT_ a b
 
   _DT-DT_ : DimT → DimT → DimT
@@ -132,7 +132,7 @@ module StaticDimensions where
              (n ℤ-ℤ n₁)
              (j ℤ-ℤ j₁)
 
-  _D-D_ : Dim -> Dim -> Dim
+  _D-D_ : Dim → Dim → Dim
   a D-D b = liftDim2 _DT-DT_ a b
 
   _DT*DT_ : DimT → DimT → DimT
@@ -146,7 +146,7 @@ module StaticDimensions where
              (n ℤ*ℤ n₁)
              (j ℤ*ℤ j₁)
 
-  _D*D_ : Dim -> Dim -> Dim
+  _D*D_ : Dim → Dim → Dim
   a D*D b = liftDim2 _DT*DT_ a b
 
   _DT² : DimT → DimT
@@ -159,7 +159,7 @@ module StaticDimensions where
            (n ℤ²)
            (j ℤ²)
 
-  _D² : Dim -> Dim
+  _D² : Dim → Dim
   a D² = liftDim1 _DT² a
 
   _DT³ : DimT → DimT
@@ -172,7 +172,7 @@ module StaticDimensions where
            (n ℤ³)
            (j ℤ³)
 
-  _D³ : Dim -> Dim
+  _D³ : Dim → Dim
   a D³ = liftDim1 _DT³ a
 
   _DT⁴ : DimT → DimT
@@ -185,7 +185,7 @@ module StaticDimensions where
            (n ℤ⁴)
            (j ℤ⁴)
 
-  _D⁴ : Dim -> Dim
+  _D⁴ : Dim → Dim
   a D⁴ = liftDim1 _DT⁴ a
 
 
