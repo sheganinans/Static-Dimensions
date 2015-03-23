@@ -430,7 +430,7 @@ module StaticDimensions where
   Gray      = L² ⊚ T⁻²
   Katal     =      T⁻¹ ⊚ N
 
-  SpringConstant  = Newton
+  SpringConstant = Newton
 
 
 {-
@@ -636,4 +636,4 @@ module StaticDimensions where
 --                                        LHS                            RHS
 --                                        ----------------------------   ----
   e=mc²isMeasuredInJoules : ∀ {m c : ℤ} → ((Q→D e= m ∙ c ²) D≡D Joule) ≡ true
-  e=mc²isMeasuredInJoules = refl -- QED. Simply evoking reflexivity.
+  e=mc²isMeasuredInJoules = refl -- QED. Simply evoking reflexivity, defined in the tiniest prelude.
