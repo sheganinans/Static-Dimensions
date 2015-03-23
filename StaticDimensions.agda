@@ -1,11 +1,8 @@
 module StaticDimensions where
 
-  open import Data.Bool
-    renaming (T to TT)
-  open import Data.Nat
-    renaming (suc to ℕsuc)
+  open import Data.Bool renaming (T to TT)
+  open import Data.Nat renaming (suc to ℕsuc) hiding (_+_;_*_)
   open import Data.Integer
-    renaming (_+_ to _ℤ+ℤ_; _-_ to _ℤ-ℤ_; _*_ to _ℤ*ℤ_)
   open import Data.Maybe
 
 
@@ -30,10 +27,10 @@ module StaticDimensions where
 -- Basic Exponents.
 
   _ℤ² : ℤ → ℤ
-  z ℤ² = z ℤ*ℤ z
+  z ℤ² = z * z
 
   _ℤ³ : ℤ → ℤ
-  z ℤ³ = z ℤ*ℤ z ℤ*ℤ z
+  z ℤ³ = z * z * z
 
   _ℤ⁴ : ℤ → ℤ
   z ℤ⁴ = z ℤ² ℤ²
@@ -105,13 +102,13 @@ module StaticDimensions where
   _DT+DT_ : DimT → DimT → DimT
   dimt m l t q θ n j DT+DT
     dimt m₁ l₁ t₁ q₁ θ₁ n₁ j₁
-      = dimt (m ℤ+ℤ m₁)
-             (l ℤ+ℤ l₁)
-             (t ℤ+ℤ t₁)
-             (q ℤ+ℤ q₁)
-             (θ ℤ+ℤ θ₁)
-             (n ℤ+ℤ n₁)
-             (j ℤ+ℤ j₁)
+      = dimt (m + m₁)
+             (l + l₁)
+             (t + t₁)
+             (q + q₁)
+             (θ + θ₁)
+             (n + n₁)
+             (j + j₁)
 
   infixl 5 _D+D_
   _D+D_ : Dim → Dim → Dim
@@ -120,13 +117,13 @@ module StaticDimensions where
   _DT-DT_ : DimT → DimT → DimT
   dimt m l t q θ n j DT-DT
     dimt m₁ l₁ t₁ q₁ θ₁ n₁ j₁
-      = dimt (m ℤ-ℤ m₁)
-             (l ℤ-ℤ l₁)
-             (t ℤ-ℤ t₁)
-             (q ℤ-ℤ q₁)
-             (θ ℤ-ℤ θ₁)
-             (n ℤ-ℤ n₁)
-             (j ℤ-ℤ j₁)
+      = dimt (m - m₁)
+             (l - l₁)
+             (t - t₁)
+             (q - q₁)
+             (θ - θ₁)
+             (n - n₁)
+             (j - j₁)
 
   _D-D_ : Dim → Dim → Dim
   a D-D b = liftDim2 _DT-DT_ a b
@@ -134,13 +131,13 @@ module StaticDimensions where
   _DT*DT_ : DimT → DimT → DimT
   dimt m l t q θ n j DT*DT
     dimt m₁ l₁ t₁ q₁ θ₁ n₁ j₁
-      = dimt (m ℤ*ℤ m₁)
-             (l ℤ*ℤ l₁)
-             (t ℤ*ℤ t₁)
-             (q ℤ*ℤ q₁)
-             (θ ℤ*ℤ θ₁)
-             (n ℤ*ℤ n₁)
-             (j ℤ*ℤ j₁)
+      = dimt (m * m₁)
+             (l * l₁)
+             (t * t₁)
+             (q * q₁)
+             (θ * θ₁)
+             (n * n₁)
+             (j * j₁)
 
   _D*D_ : Dim → Dim → Dim
   a D*D b = liftDim2 _DT*DT_ a b
@@ -190,49 +187,49 @@ module StaticDimensions where
 -}
 
   _m+ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j m+ℤ z = dimt (m ℤ+ℤ z) l  t  q  θ  n  j
+  dimt m l t q θ n j m+ℤ z = dimt (m + z) l  t  q  θ  n  j
   _l+ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j l+ℤ z = dimt  m (l ℤ+ℤ z) t  q  θ  n  j
+  dimt m l t q θ n j l+ℤ z = dimt  m (l + z) t  q  θ  n  j
   _t+ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j t+ℤ z = dimt  m  l (t ℤ+ℤ z) q  θ  n  j
+  dimt m l t q θ n j t+ℤ z = dimt  m  l (t + z) q  θ  n  j
   _q+ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j q+ℤ z = dimt  m  l  t (q ℤ+ℤ z) θ  n  j
+  dimt m l t q θ n j q+ℤ z = dimt  m  l  t (q + z) θ  n  j
   _θ+ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j θ+ℤ z = dimt  m  l  t  q (θ ℤ+ℤ z) n  j
+  dimt m l t q θ n j θ+ℤ z = dimt  m  l  t  q (θ + z) n  j
   _n+ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j n+ℤ z = dimt  m  l  t  q  θ (n ℤ+ℤ z) j
+  dimt m l t q θ n j n+ℤ z = dimt  m  l  t  q  θ (n + z) j
   _j+ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j j+ℤ z = dimt  m  l  t  q  θ  n (j ℤ+ℤ z)
+  dimt m l t q θ n j j+ℤ z = dimt  m  l  t  q  θ  n (j + z)
 
   _m-ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j m-ℤ z = dimt (m ℤ-ℤ z) l  t  q  θ  n  j
+  dimt m l t q θ n j m-ℤ z = dimt (m - z) l  t  q  θ  n  j
   _l-ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j l-ℤ z = dimt  m (l ℤ-ℤ z) t  q  θ  n  j
+  dimt m l t q θ n j l-ℤ z = dimt  m (l - z) t  q  θ  n  j
   _t-ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j t-ℤ z = dimt  m  l (t ℤ-ℤ z) q  θ  n  j
+  dimt m l t q θ n j t-ℤ z = dimt  m  l (t - z) q  θ  n  j
   _q-ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j q-ℤ z = dimt  m  l  t (q ℤ-ℤ z) θ  n  j
+  dimt m l t q θ n j q-ℤ z = dimt  m  l  t (q - z) θ  n  j
   _θ-ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j θ-ℤ z = dimt  m  l  t  q (θ ℤ-ℤ z) n  j
+  dimt m l t q θ n j θ-ℤ z = dimt  m  l  t  q (θ - z) n  j
   _n-ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j n-ℤ z = dimt  m  l  t  q  θ (n ℤ-ℤ z) j
+  dimt m l t q θ n j n-ℤ z = dimt  m  l  t  q  θ (n - z) j
   _j-ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j j-ℤ z = dimt  m  l  t  q  θ  n (j ℤ-ℤ z)
+  dimt m l t q θ n j j-ℤ z = dimt  m  l  t  q  θ  n (j - z)
 
   _m*ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j m*ℤ z = dimt (m ℤ*ℤ z) l  t  q  θ  n  j
+  dimt m l t q θ n j m*ℤ z = dimt (m * z) l  t  q  θ  n  j
   _l*ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j l*ℤ z = dimt  m (l ℤ*ℤ z) t  q  θ  n  j
+  dimt m l t q θ n j l*ℤ z = dimt  m (l * z) t  q  θ  n  j
   _t*ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j t*ℤ z = dimt  m  l (t ℤ*ℤ z) q  θ  n  j
+  dimt m l t q θ n j t*ℤ z = dimt  m  l (t * z) q  θ  n  j
   _q*ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j q*ℤ z = dimt  m  l  t (q ℤ*ℤ z) θ  n  j
+  dimt m l t q θ n j q*ℤ z = dimt  m  l  t (q * z) θ  n  j
   _θ*ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j θ*ℤ z = dimt  m  l  t  q (θ ℤ*ℤ z) n  j
+  dimt m l t q θ n j θ*ℤ z = dimt  m  l  t  q (θ * z) n  j
   _n*ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j n*ℤ z = dimt  m  l  t  q  θ (n ℤ*ℤ z) j
+  dimt m l t q θ n j n*ℤ z = dimt  m  l  t  q  θ (n * z) j
   _j*ℤ_ : DimT → ℤ → DimT
-  dimt m l t q θ n j j*ℤ z = dimt  m  l  t  q  θ  n (j ℤ*ℤ z)
+  dimt m l t q θ n j j*ℤ z = dimt  m  l  t  q  θ  n (j * z)
 
 
 {-
@@ -471,7 +468,7 @@ module StaticDimensions where
   _Q+Q_ : Quantity → Quantity → Maybe Quantity
   quant d q Q+Q quant d₁ q₁
     = if d D≡D d₁
-      then just (quant d (q ℤ+ℤ q₁))
+      then just (quant d (q + q₁))
       else nothing
 
 
@@ -482,7 +479,7 @@ module StaticDimensions where
 
   _Q*Q_ : Quantity → Quantity → Quantity
   quant d q Q*Q quant d₁ q₁
-      = quant (d D+D d₁) (q ℤ*ℤ q₁)
+      = quant (d D+D d₁) (q * q₁)
 
   _Q² : Quantity → Quantity
   quant d q Q² = quant (d D+D d) (q ℤ²)
@@ -494,13 +491,13 @@ module StaticDimensions where
   quant d q Q⁴ = quant (d D+D d D+D d D+D d) (q ℤ⁴)
 
   _Q+ℤ_ : Quantity → ℤ → Quantity
-  quant d q Q+ℤ z = quant d (q ℤ+ℤ z)
+  quant d q Q+ℤ z = quant d (q + z)
 
   _Q-ℤ_ : Quantity → ℤ → Quantity
-  quant d q Q-ℤ z = quant d (q ℤ-ℤ z)
+  quant d q Q-ℤ z = quant d (q - z)
 
   _Q*ℤ_ : Quantity → ℤ → Quantity
-  quant d q Q*ℤ z = quant d (q ℤ*ℤ z)
+  quant d q Q*ℤ z = quant d (q * z)
 
   -Q_ : Quantity → Quantity
   -Q q = q Q*ℤ -[1+ 0 ]
