@@ -3,7 +3,7 @@ module StaticDimensions where
   open import Data.Bool
     renaming (T to TT)
   open import Data.Nat
-    renaming (_+_ to _ℕ+ℕ_; _*_ to _ℕ*ℕ_; suc to ℕsuc)
+    renaming (_+_ to _ℕ+ℕ_; _*_ to _ℕ*ℕ_; suc to ℕsuc; pred to ℕpred)
   open import Data.Integer
     renaming (_+_ to _ℤ+ℤ_; _-_ to _ℤ-ℤ_; _*_ to _ℤ*ℤ_; suc to ℤsuc)
   open import Data.Maybe
@@ -33,6 +33,15 @@ module StaticDimensions where
 
 -- Basic Exponents.
 
+  _ℕ² : ℕ → ℕ
+  z ℕ² = z ℕ*ℕ z
+
+  _ℕ³ : ℕ → ℕ
+  z ℕ³ = z ℕ*ℕ z ℕ*ℕ z
+
+  _ℕ⁴ : ℕ → ℕ
+  z ℕ⁴ = z ℕ*ℕ z ℕ*ℕ z ℕ*ℕ z
+
   _ℤ² : ℤ → ℤ
   z ℤ² = z ℤ*ℤ z
 
@@ -45,13 +54,13 @@ module StaticDimensions where
 
 {-
   Dim is the central datastructure in this file, each physical quantity has a dimension.
-  Quantities can also be dimensionless by having zeroes in all seven positions.
+  A dimension is a pair of DimT, which represent the positive and negative components of a dimension.
   You can add only like dimensions and you can multiply like and unlike dimensions.
   However that logic comes later, this is simply the definition.
 -}
 
-  record Dim : Set where
-    constructor dim
+  record DimT : Set where
+    constructor dimt
     field
       m : ℤ
       l : ℤ
@@ -61,15 +70,21 @@ module StaticDimensions where
       n : ℤ
       j : ℤ
 
+  record Dim : Set where
+    constructor dim
+    field
+      pos : DimT
+      neg : DimT
+
 
 {-
   Equality of dimensions, simply makes sure that all the integers in each position are
   equal between the two dimensions.
 -}
 
-  _D≡D_ : Dim → Dim → Bool
-  dim m l t q θ n j D≡D
-    dim m₁ l₁ t₁ q₁ θ₁ n₁ j₁
+  _DT≡DT_ : DimT → DimT → Bool
+  dimt m l t q θ n j DT≡DT
+    dimt m₁ l₁ t₁ q₁ θ₁ n₁ j₁
       = m ℤ≡ℤ m₁
       ∧ l ℤ≡ℤ l₁
       ∧ t ℤ≡ℤ t₁
@@ -78,124 +93,156 @@ module StaticDimensions where
       ∧ n ℤ≡ℤ n₁
       ∧ j ℤ≡ℤ j₁
 
+  _D≡D_ : Dim -> Dim -> Bool
+  dim p n D≡D dim p₁ n₁ = p DT≡DT p₁ ∧ n DT≡DT n₁
+
+
+{-
+  Helper functions to lift functions from DimT to Dim.
+-}
+
+  liftDim1 : (DimT -> DimT) -> Dim -> Dim
+  liftDim1 f (dim p n) = dim (f p) (f n)
+
+  liftDim2 : (DimT -> DimT -> DimT) -> Dim -> Dim -> Dim
+  liftDim2 f (dim p n) (dim p₁ n₁) = dim (f p p₁) (f n n₁)
+
 
 {-
   Addition, subtraction, multiplication, and exponentiation of dimensions.
   Simply wrapping integer operations.
 -}
 
-  _D+D_ : Dim → Dim → Dim
-  dim m l t q θ n j D+D
-    dim m₁ l₁ t₁ q₁ θ₁ n₁ j₁
-      = dim (m ℤ+ℤ m₁)
-            (l ℤ+ℤ l₁)
-            (t ℤ+ℤ t₁)
-            (q ℤ+ℤ q₁)
-            (θ ℤ+ℤ θ₁)
-            (n ℤ+ℤ n₁)
-            (j ℤ+ℤ j₁)
+  _DT+DT_ : DimT → DimT → DimT
+  dimt m l t q θ n j DT+DT
+    dimt m₁ l₁ t₁ q₁ θ₁ n₁ j₁
+      = dimt (m ℤ+ℤ m₁)
+             (l ℤ+ℤ l₁)
+             (t ℤ+ℤ t₁)
+             (q ℤ+ℤ q₁)
+             (θ ℤ+ℤ θ₁)
+             (n ℤ+ℤ n₁)
+             (j ℤ+ℤ j₁)
 
-  _D-D_ : Dim → Dim → Dim
-  dim m l t q θ n j D-D
-    dim m₁ l₁ t₁ q₁ θ₁ n₁ j₁
-      = dim (m ℤ-ℤ m₁)
-            (l ℤ-ℤ l₁)
-            (t ℤ-ℤ t₁)
-            (q ℤ-ℤ q₁)
-            (θ ℤ-ℤ θ₁)
-            (n ℤ-ℤ n₁)
-            (j ℤ-ℤ j₁)
+  _D+D_ : Dim -> Dim -> Dim
+  a D+D b = liftDim2 _DT+DT_ a b
 
-  _D*D_ : Dim → Dim → Dim
-  dim m l t q θ n j D*D
-    dim m₁ l₁ t₁ q₁ θ₁ n₁ j₁
-      = dim (m ℤ*ℤ m₁)
-            (l ℤ*ℤ l₁)
-            (t ℤ*ℤ t₁)
-            (q ℤ*ℤ q₁)
-            (θ ℤ*ℤ θ₁)
-            (n ℤ*ℤ n₁)
-            (j ℤ*ℤ j₁)
+  _DT-DT_ : DimT → DimT → DimT
+  dimt m l t q θ n j DT-DT
+    dimt m₁ l₁ t₁ q₁ θ₁ n₁ j₁
+      = dimt (m ℤ-ℤ m₁)
+             (l ℤ-ℤ l₁)
+             (t ℤ-ℤ t₁)
+             (q ℤ-ℤ q₁)
+             (θ ℤ-ℤ θ₁)
+             (n ℤ-ℤ n₁)
+             (j ℤ-ℤ j₁)
 
-  _D² : Dim → Dim
-  dim m l t q θ n j D²
-    = dim (m ℤ²)
-          (l ℤ²)
-          (t ℤ²)
-          (q ℤ²)
-          (θ ℤ²)
-          (n ℤ²)
-          (j ℤ²)
+  _D-D_ : Dim -> Dim -> Dim
+  a D-D b = liftDim2 _DT-DT_ a b
 
-  _D³ : Dim → Dim
-  dim m l t q θ n j D³
-    = dim (m ℤ³)
-          (l ℤ³)
-          (t ℤ³)
-          (q ℤ³)
-          (θ ℤ³)
-          (n ℤ³)
-          (j ℤ³)
+  _DT*DT_ : DimT → DimT → DimT
+  dimt m l t q θ n j DT*DT
+    dimt m₁ l₁ t₁ q₁ θ₁ n₁ j₁
+      = dimt (m ℤ*ℤ m₁)
+             (l ℤ*ℤ l₁)
+             (t ℤ*ℤ t₁)
+             (q ℤ*ℤ q₁)
+             (θ ℤ*ℤ θ₁)
+             (n ℤ*ℤ n₁)
+             (j ℤ*ℤ j₁)
 
-  _D⁴ : Dim → Dim
-  dim m l t q θ n j D⁴
-    = dim (m ℤ⁴)
-          (l ℤ⁴)
-          (t ℤ⁴)
-          (q ℤ⁴)
-          (θ ℤ⁴)
-          (n ℤ⁴)
-          (j ℤ⁴)
+  _D*D_ : Dim -> Dim -> Dim
+  a D*D b = liftDim2 _DT*DT_ a b
+
+  _DT² : DimT → DimT
+  dimt m l t q θ n j DT²
+    = dimt (m ℤ²)
+           (l ℤ²)
+           (t ℤ²)
+           (q ℤ²)
+           (θ ℤ²)
+           (n ℤ²)
+           (j ℤ²)
+
+  _D² : Dim -> Dim
+  a D² = liftDim1 _DT² a
+
+  _DT³ : DimT → DimT
+  dimt m l t q θ n j DT³
+    = dimt (m ℤ³)
+           (l ℤ³)
+           (t ℤ³)
+           (q ℤ³)
+           (θ ℤ³)
+           (n ℤ³)
+           (j ℤ³)
+
+  _D³ : Dim -> Dim
+  a D³ = liftDim1 _DT³ a
+
+  _DT⁴ : DimT → DimT
+  dimt m l t q θ n j DT⁴
+    = dimt (m ℤ⁴)
+           (l ℤ⁴)
+           (t ℤ⁴)
+           (q ℤ⁴)
+           (θ ℤ⁴)
+           (n ℤ⁴)
+           (j ℤ⁴)
+
+  _D⁴ : Dim -> Dim
+  a D⁴ = liftDim1 _DT⁴ a
 
 
 {-
   Wrappers for addition, subtraction, and multiplication of a specific component by a scalar.
 -}
 
-  _m+ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j m+ℤ z = dim (m ℤ+ℤ z) l  t  q  θ  n  j
-  _l+ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j l+ℤ z = dim  m (l ℤ+ℤ z) t  q  θ  n  j
-  _t+ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j t+ℤ z = dim  m  l (t ℤ+ℤ z) q  θ  n  j
-  _q+ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j q+ℤ z = dim  m  l  t (q ℤ+ℤ z) θ  n  j
-  _θ+ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j θ+ℤ z = dim  m  l  t  q (θ ℤ+ℤ z) n  j
-  _n+ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j n+ℤ z = dim  m  l  t  q  θ (n ℤ+ℤ z) j
-  _j+ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j j+ℤ z = dim  m  l  t  q  θ  n (j ℤ+ℤ z)
+  _m+ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j m+ℤ z = dimt (m ℤ+ℤ z) l  t  q  θ  n  j
+  _l+ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j l+ℤ z = dimt  m (l ℤ+ℤ z) t  q  θ  n  j
+  _t+ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j t+ℤ z = dimt  m  l (t ℤ+ℤ z) q  θ  n  j
+  _q+ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j q+ℤ z = dimt  m  l  t (q ℤ+ℤ z) θ  n  j
+  _θ+ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j θ+ℤ z = dimt  m  l  t  q (θ ℤ+ℤ z) n  j
+  _n+ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j n+ℤ z = dimt  m  l  t  q  θ (n ℤ+ℤ z) j
+  _j+ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j j+ℤ z = dimt  m  l  t  q  θ  n (j ℤ+ℤ z)
 
-  _m-ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j m-ℤ z = dim (m ℤ-ℤ z) l  t  q  θ  n  j
-  _l-ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j l-ℤ z = dim  m (l ℤ-ℤ z) t  q  θ  n  j
-  _t-ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j t-ℤ z = dim  m  l (t ℤ-ℤ z) q  θ  n  j
-  _q-ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j q-ℤ z = dim  m  l  t (q ℤ-ℤ z) θ  n  j
-  _θ-ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j θ-ℤ z = dim  m  l  t  q (θ ℤ-ℤ z) n  j
-  _n-ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j n-ℤ z = dim  m  l  t  q  θ (n ℤ-ℤ z) j
-  _j-ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j j-ℤ z = dim  m  l  t  q  θ  n (j ℤ-ℤ z)
+  _m-ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j m-ℤ z = dimt (m ℤ-ℤ z) l  t  q  θ  n  j
+  _l-ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j l-ℤ z = dimt  m (l ℤ-ℤ z) t  q  θ  n  j
+  _t-ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j t-ℤ z = dimt  m  l (t ℤ-ℤ z) q  θ  n  j
+  _q-ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j q-ℤ z = dimt  m  l  t (q ℤ-ℤ z) θ  n  j
+  _θ-ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j θ-ℤ z = dimt  m  l  t  q (θ ℤ-ℤ z) n  j
+  _n-ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j n-ℤ z = dimt  m  l  t  q  θ (n ℤ-ℤ z) j
+  _j-ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j j-ℤ z = dimt  m  l  t  q  θ  n (j ℤ-ℤ z)
 
-  _m*ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j m*ℤ z = dim (m ℤ*ℤ z) l  t  q  θ  n  j
-  _l*ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j l*ℤ z = dim  m (l ℤ*ℤ z) t  q  θ  n  j
-  _t*ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j t*ℤ z = dim  m  l (t ℤ*ℤ z) q  θ  n  j
-  _q*ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j q*ℤ z = dim  m  l  t (q ℤ*ℤ z) θ  n  j
-  _θ*ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j θ*ℤ z = dim  m  l  t  q (θ ℤ*ℤ z) n  j
-  _n*ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j n*ℤ z = dim  m  l  t  q  θ (n ℤ*ℤ z) j
-  _j*ℤ_ : Dim → ℤ → Dim
-  dim m l t q θ n j j*ℤ z = dim  m  l  t  q  θ  n (j ℤ*ℤ z)
+  _m*ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j m*ℤ z = dimt (m ℤ*ℤ z) l  t  q  θ  n  j
+  _l*ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j l*ℤ z = dimt  m (l ℤ*ℤ z) t  q  θ  n  j
+  _t*ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j t*ℤ z = dimt  m  l (t ℤ*ℤ z) q  θ  n  j
+  _q*ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j q*ℤ z = dimt  m  l  t (q ℤ*ℤ z) θ  n  j
+  _θ*ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j θ*ℤ z = dimt  m  l  t  q (θ ℤ*ℤ z) n  j
+  _n*ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j n*ℤ z = dimt  m  l  t  q  θ (n ℤ*ℤ z) j
+  _j*ℤ_ : DimT → ℤ → DimT
+  dimt m l t q θ n j j*ℤ z = dimt  m  l  t  q  θ  n (j ℤ*ℤ z)
 
 
 {-
@@ -207,93 +254,127 @@ module StaticDimensions where
 
 
 {-
-  Using the previously defined scalar operations to define succ and pred for each component.
+  Using the previously defined scalar operations to define succ and pred for pos and neg for each component.
 -}
 
-  _M++ : Dim → Dim
-  d M++ = d m+ℤ ℤ1
-  _L++ : Dim → Dim
-  d L++ = d l+ℤ ℤ1
-  _T++ : Dim → Dim
-  d T++ = d t+ℤ ℤ1
-  _Q++ : Dim → Dim
-  d Q++ = d q+ℤ ℤ1
-  _Θ++ : Dim → Dim
-  d Θ++ = d θ+ℤ ℤ1
-  _N++ : Dim → Dim
-  d N++ = d n+ℤ ℤ1
-  _J++ : Dim → Dim
-  d J++ = d j+ℤ ℤ1
+  _Mp++ : Dim → Dim
+  dim p n Mp++ = dim (p m+ℤ ℤ1) n
+  _Lp++ : Dim → Dim
+  dim p n Lp++ = dim (p l+ℤ ℤ1) n
+  _Tp++ : Dim → Dim
+  dim p n Tp++ = dim (p t+ℤ ℤ1) n
+  _Qp++ : Dim → Dim
+  dim p n Qp++ = dim (p q+ℤ ℤ1) n
+  _Θp++ : Dim → Dim
+  dim p n Θp++ = dim (p θ+ℤ ℤ1) n
+  _Np++ : Dim → Dim
+  dim p n Np++ = dim (p n+ℤ ℤ1) n
+  _Jp++ : Dim → Dim
+  dim p n Jp++ = dim (p j+ℤ ℤ1) n
 
-  _M-- : Dim → Dim
-  d M-- = d m-ℤ ℤ1
-  _L-- : Dim → Dim
-  d L-- = d l-ℤ ℤ1
-  _T-- : Dim → Dim
-  d T-- = d t-ℤ ℤ1
-  _Q-- : Dim → Dim
-  d Q-- = d q-ℤ ℤ1
-  _Θ-- : Dim → Dim
-  d Θ-- = d θ-ℤ ℤ1
-  _N-- : Dim → Dim
-  d N-- = d n-ℤ ℤ1
-  _J-- : Dim → Dim
-  d J-- = d j-ℤ ℤ1
+  _Mn++ : Dim → Dim
+  dim p n Mn++ = dim p (n m+ℤ ℤ1)
+  _Ln++ : Dim → Dim
+  dim p n Ln++ = dim p (n l+ℤ ℤ1)
+  _Tn++ : Dim → Dim
+  dim p n Tn++ = dim p (n t+ℤ ℤ1)
+  _Qn++ : Dim → Dim
+  dim p n Qn++ = dim p (n q+ℤ ℤ1)
+  _Θn++ : Dim → Dim
+  dim p n Θn++ = dim p (n θ+ℤ ℤ1)
+  _Nn++ : Dim → Dim
+  dim p n Nn++ = dim p (n n+ℤ ℤ1)
+  _Jn++ : Dim → Dim
+  dim p n Jn++ = dim p (n j+ℤ ℤ1)
+
+
+  _Mp-- : Dim → Dim
+  dim p n Mp-- = dim (p m-ℤ ℤ1) n
+  _Lp-- : Dim → Dim
+  dim p n Lp-- = dim (p l-ℤ ℤ1) n
+  _Tp-- : Dim → Dim
+  dim p n Tp-- = dim (p t-ℤ ℤ1) n
+  _Qp-- : Dim → Dim
+  dim p n Qp-- = dim (p q-ℤ ℤ1) n
+  _Θp-- : Dim → Dim
+  dim p n Θp-- = dim (p θ-ℤ ℤ1) n
+  _Np-- : Dim → Dim
+  dim p n Np-- = dim (p n-ℤ ℤ1) n
+  _Jp-- : Dim → Dim
+  dim p n Jp-- = dim (p j-ℤ ℤ1) n
+
+  _Mn-- : Dim → Dim
+  dim p n Mn-- = dim p (n m-ℤ ℤ1)
+  _Ln-- : Dim → Dim
+  dim p n Ln-- = dim p (n l-ℤ ℤ1)
+  _Tn-- : Dim → Dim
+  dim p n Tn-- = dim p (n t-ℤ ℤ1)
+  _Qn-- : Dim → Dim
+  dim p n Qn-- = dim p (n q-ℤ ℤ1)
+  _Θn-- : Dim → Dim
+  dim p n Θn-- = dim p (n θ-ℤ ℤ1)
+  _Nn-- : Dim → Dim
+  dim p n Nn-- = dim p (n n-ℤ ℤ1)
+  _Jn-- : Dim → Dim
+  dim p n Jn-- = dim p (n j-ℤ ℤ1)
 
 
 {-
   The zeroth dimension, along with an enumeration of the lower dimensions.
 -}
 
-  D0 : Dim -- m  l  t  q  θ  n  j
-  D0 = dim   ℤ0 ℤ0 ℤ0 ℤ0 ℤ0 ℤ0 ℤ0
-  M  = D0 M++
-  L  = D0 L++
-  T  = D0 T++
-  Q  = D0 Q++
-  Θ  = D0 Θ++
-  N  = D0 N++
-  J  = D0 J++
+  D0T : DimT -- m  l  t  q  θ  n  j
+  D0T = dimt   ℤ0 ℤ0 ℤ0 ℤ0 ℤ0 ℤ0 ℤ0
+  D0 : Dim
+  D0 = dim D0T D0T
 
-  M⁻¹ = D0 M--
-  L⁻¹ = D0 L--
-  T⁻¹ = D0 T--
-  Q⁻¹ = D0 Q--
-  Θ⁻¹ = D0 Θ--
-  N⁻¹ = D0 N--
-  J⁻¹ = D0 J--
+  M  = D0 Mp++
+  L  = D0 Lp++
+  T  = D0 Tp++
+  Q  = D0 Qp++
+  Θ  = D0 Θp++
+  N  = D0 Np++
+  J  = D0 Jp++
 
-  M² = M M++
-  L² = L L++
-  T² = T T++
-  Q² = Q Q++
-  Θ² = Θ Θ++
-  N² = N N++
-  J² = J J++
+  M⁻¹ = D0 Mn++
+  L⁻¹ = D0 Ln++
+  T⁻¹ = D0 Tn++
+  Q⁻¹ = D0 Qn++
+  Θ⁻¹ = D0 Θn++
+  N⁻¹ = D0 Nn++
+  J⁻¹ = D0 Jn++
 
-  M⁻² = M⁻¹ M--
-  L⁻² = L⁻¹ L--
-  T⁻² = T⁻¹ T--
-  Q⁻² = Q⁻¹ Q--
-  Θ⁻² = Θ⁻¹ Θ--
-  N⁻² = N⁻¹ N--
-  J⁻² = J⁻¹ J--
+  M² = M Mp++
+  L² = L Lp++
+  T² = T Tp++
+  Q² = Q Qp++
+  Θ² = Θ Θp++
+  N² = N Np++
+  J² = J Jp++
 
-  M³ = M² M++
-  L³ = L² L++
-  T³ = T² T++
-  Q³ = Q² Q++
-  Θ³ = Θ² Θ++
-  N³ = N² N++
-  J³ = J² J++
+  M⁻² = M⁻¹ Mn++
+  L⁻² = L⁻¹ Ln++
+  T⁻² = T⁻¹ Tn++
+  Q⁻² = Q⁻¹ Qn++
+  Θ⁻² = Θ⁻¹ Θn++
+  N⁻² = N⁻¹ Nn++
+  J⁻² = J⁻¹ Jn++
 
-  M⁻³ = M⁻² M--
-  L⁻³ = L⁻² L--
-  T⁻³ = T⁻² T--
-  Q⁻³ = Q⁻² Q--
-  Θ⁻³ = Θ⁻² Θ--
-  N⁻³ = N⁻² N--
-  J⁻³ = J⁻² J--
+  M³ = M² Mp++
+  L³ = L² Lp++
+  T³ = T² Tp++
+  Q³ = Q² Qp++
+  Θ³ = Θ² Θp++
+  N³ = N² Np++
+  J³ = J² Jp++
+
+  M⁻³ = M⁻² Mn++
+  L⁻³ = L⁻² Ln++
+  T⁻³ = T⁻² Tn++
+  Q⁻³ = Q⁻² Qn++
+  Θ⁻³ = Θ⁻² Θn++
+  N⁻³ = N⁻² Nn++
+  J⁻³ = J⁻² Jn++
 
 
 {-
@@ -352,13 +433,13 @@ module StaticDimensions where
 
 {-
   The second most important (and only other) datastructure.
-  Every quanitity has a scalar value and a dimension.
+  Every quanitity has a scalar value and a positive dimension and a negative dimension.
 -}
 
   record Quantity : Set where
     constructor quant
     field
-      dimension : Dim
+      d : Dim
       quantity  : ℤ
 
 
