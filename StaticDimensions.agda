@@ -3,9 +3,9 @@ module StaticDimensions where
   open import Data.Bool
     renaming (T to TT)
   open import Data.Nat
-    renaming (_+_ to _ℕ+ℕ_; _*_ to _ℕ*ℕ_; suc to ℕsuc)
+    renaming (suc to ℕsuc)
   open import Data.Integer
-    renaming (_+_ to _ℤ+ℤ_; _-_ to _ℤ-ℤ_; _*_ to _ℤ*ℤ_; suc to ℤsuc)
+    renaming (_+_ to _ℤ+ℤ_; _-_ to _ℤ-ℤ_; _*_ to _ℤ*ℤ_)
   open import Data.Maybe
 
 
@@ -597,9 +597,6 @@ module StaticDimensions where
 
   _henrys : ℤ → Quantity
   h henrys = quant Henry h
-
-  _celciuss : ℤ → Quantity
-  c celciuss = quant Celcius c
 
   _lumens : ℤ → Quantity
   l lumens = quant Lumen l
